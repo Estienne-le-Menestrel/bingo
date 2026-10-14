@@ -58,6 +58,7 @@
   --sign: "Bungee", "Arial Black", Impact, system-ui, sans-serif;
   --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   color-scheme: light;
 }
 
@@ -557,10 +558,16 @@ details summary { cursor: pointer; font: 400 1rem var(--sign); }
   box-shadow: 0 6px 20px rgba(0, 0, 0, .35);
 }
 
-/* Bouton des sons */
+/* Bandeau du bas : bouton des sons et réactions */
+.dock {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+  padding: 0 12px max(12px, env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.dock > * { pointer-events: auto; }
 .sfx-toggle {
-  position: fixed; left: 12px; bottom: max(12px, env(safe-area-inset-bottom));
-  z-index: 30;
+  flex: none;
   display: inline-flex; align-items: center; gap: 6px;
   font: 700 .85rem var(--body);
   color: var(--on-felt);
@@ -577,6 +584,8 @@ details summary { cursor: pointer; font: 400 1rem var(--sign); }
 .sfx-toggle[aria-pressed="true"] { border-color: #FFD54A; }
 
 @media (max-width: 520px) {
+  body.has-react .sfx-label { display: none; }
+  body.has-react .sfx-toggle { padding: 6px 8px; }
   .wordcards { grid-template-columns: 1fr; }
   .board { gap: 1.5px; }
   .cell { min-height: 96px; }
@@ -705,12 +714,12 @@ details summary { cursor: pointer; font: 400 1rem var(--sign); }
   flex: 1 1 0; min-width: 0;
   display: flex; flex-direction: column; align-items: center;
   transform-style: preserve-3d;
-  --d: 64px;
+  --d: calc(64px * var(--ps, 1));
   --step: var(--podium);
 }
-.spot.p1 { --h: 120px; }
-.spot.p2 { --h: 84px; }
-.spot.p3 { --h: 58px; }
+.spot.p1 { --h: calc(120px * var(--ps, 1)); }
+.spot.p2 { --h: calc(84px * var(--ps, 1)); }
+.spot.p3 { --h: calc(58px * var(--ps, 1)); }
 .spot.gold { --step: var(--token); }
 .spot .box {
   position: relative; width: 100%; height: var(--h);
@@ -898,4 +907,276 @@ body.intro-open { overflow: hidden; }
   position: absolute; left: 12px; top: max(14px, env(safe-area-inset-top)); z-index: 2; margin: 0;
   padding: 4px 10px; border-radius: 999px; background: rgba(5, 12, 22, .75); color: #7df3ff;
   font: 700 .8rem var(--body);
+}
+
+/* ===================================================================
+   Avatars, « écrit… », idées de mots, réactions
+   =================================================================== */
+.avatars { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; }
+.avatars button {
+  aspect-ratio: 1; min-height: 42px; padding: 0;
+  display: grid; place-items: center;
+  font: 1.45rem/1 var(--emoji);
+  background: var(--paper-hi);
+  border: 2px solid rgba(30, 27, 58, .22); border-radius: 12px;
+  cursor: pointer;
+  transition: transform .1s, border-color .1s;
+}
+@media (hover: hover) { .avatars button:hover { border-color: var(--ink); } }
+.avatars button[aria-checked="true"] { border-color: var(--red); background: #FFE1E6; box-shadow: inset 0 0 0 2px var(--red); transform: scale(1.06); }
+.avatars button.taken { opacity: .35; }
+.avatars button.picked { animation: chipPop .28s cubic-bezier(.2, 1.6, .4, 1); }
+#j-avatar { margin: 4px 0 16px; }
+.avatar-change { margin-top: 6px; }
+.avatar-change summary { font: 700 .92rem var(--body); color: var(--muted); }
+.avatar-change .avatars { margin-top: 10px; }
+#l-avatar-now { font-family: var(--emoji); margin-left: 4px; }
+
+.ball.emoji::before { inset: 9%; }
+.ball .ae { font: 1.35em/1 var(--emoji); }
+.spot .disc.emoji { font: 1.55rem/1 var(--emoji); background: var(--paper-hi); box-shadow: inset 0 0 0 3px var(--step), inset 0 -4px 0 rgba(0, 0, 0, .12); }
+
+.tdots { display: inline-flex; align-items: center; gap: 3px; flex: none; }
+.tdots i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: tdot 1s ease-in-out infinite; }
+.tdots i:nth-child(2) { animation-delay: .15s; }
+.tdots i:nth-child(3) { animation-delay: .3s; }
+@keyframes tdot { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-3px); opacity: 1; } }
+.players .tdots {
+  display: none; position: absolute; left: 17px; bottom: -5px; z-index: 1;
+  padding: 3px 4px; gap: 2px; border-radius: 999px;
+  background: var(--paper-hi); color: var(--purple); box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
+}
+.players .tdots i { width: 4px; height: 4px; }
+.players li.typing .tdots { display: inline-flex; }
+.typing-line { display: flex; align-items: center; gap: 8px; margin: 2px 0 6px; font-weight: 700; color: var(--purple); }
+
+.ideas { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 2px dashed var(--line); }
+.ideas-head { flex: 1 0 100%; margin: 0; font-size: .92rem; }
+.ideas-title { font-weight: 700; }
+.ideas-head .hint { font-size: .88rem; }
+.idea-chips { display: contents; }
+.idea {
+  position: relative;
+  font: 700 .9rem/1.2 var(--body); color: var(--ink);
+  background: var(--board);
+  border: 2px solid var(--ink); border-radius: 6px;
+  padding: 7px 12px 7px 19px; min-height: 38px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--ink);
+  transition: transform .08s, box-shadow .08s;
+}
+.idea::before { content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; border-left: 2px dashed rgba(30, 27, 58, .4); }
+.idea:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.idea.fresh { animation: ideaIn .35s cubic-bezier(.2, 1.5, .4, 1) backwards; }
+@keyframes ideaIn { from { transform: translateY(8px) scale(.85); opacity: 0; } }
+.idea.nope { animation: nope .3s; }
+@keyframes nope { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.idea-chips.full .idea { opacity: .5; cursor: not-allowed; }
+#ideas-more { min-height: 38px; }
+.idea-ghost { position: fixed; z-index: 70; margin: 0; pointer-events: none; }
+
+.bar-react { display: flex; justify-content: center; }
+.bar-react:empty { display: none; }
+.reactbar {
+  position: relative; overflow: hidden;
+  display: flex; gap: 4px; padding: 4px;
+  background: rgba(13, 12, 28, .85);
+  border: 2px solid rgba(247, 239, 216, .55); border-radius: 999px;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.react {
+  width: 40px; height: 40px; padding: 0; flex: none;
+  display: grid; place-items: center;
+  font: 1.3rem/1 var(--emoji);
+  background: var(--paper-hi);
+  border: 2px solid var(--ink); border-radius: 50%;
+  box-shadow: 0 2px 0 var(--ink);
+  cursor: pointer;
+  transition: transform .08s, box-shadow .08s, opacity .15s;
+}
+.react:active { transform: translateY(2px); box-shadow: 0 0 0 var(--ink); }
+.react.picked { animation: chipPop .3s cubic-bezier(.2, 1.6, .4, 1); }
+.reactbar.cooling .react { opacity: .55; pointer-events: none; }
+.reactbar.cooling::after {
+  content: ""; position: absolute; left: 14px; right: 14px; bottom: 1px; height: 3px; border-radius: 2px;
+  background: #FFD54A; transform-origin: left; animation: cool 1s linear forwards;
+}
+@keyframes cool { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.fx-react { position: fixed; inset: 0; z-index: 42; pointer-events: none; overflow: hidden; }
+.rb { position: absolute; bottom: 76px; display: flex; flex-direction: column; align-items: center; gap: 2px; will-change: transform, opacity; }
+.rb-e { font: 2.6rem/1 var(--emoji); filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35)); }
+.rb-n {
+  max-width: 12em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font: 700 .78rem/1.3 var(--body); color: var(--ink);
+  background: var(--paper-hi); border-radius: 999px; padding: 1px 8px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .25);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tdots i, .idea.fresh, .idea.nope, .react.picked, .avatars button.picked { animation: none; }
+}
+
+/* ===================================================================
+   Ordinateur portable (paysage) : chaque écran tient dans la fenêtre, sans défilement
+   =================================================================== */
+@media (min-width: 1000px) and (min-height: 520px) and (orientation: landscape) {
+  #app {
+    max-width: 1320px; height: 100vh; height: 100dvh;
+    padding: 14px 24px 54px;
+    display: flex; flex-direction: column;
+  }
+  #app > .view { flex: 1; min-height: 0; }
+  .sfx-label { display: none; }
+  .sfx-toggle { padding: 6px 8px; }
+  .panel { margin: 0; }
+  .toast { bottom: 18px; }
+
+  /* Accueil : enseigne et règles à gauche, création à droite */
+  #v-home:not([hidden]) {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 32px; row-gap: 12px; align-content: safe center;
+  }
+  #v-home > .marquee { grid-column: 1; grid-row: 1; }
+  #v-home > .hero-actions { grid-column: 1; grid-row: 2; margin: 0; }
+  #v-home > .how { grid-column: 1; grid-row: 3; margin: 0; }
+  #v-home > #f-goto { grid-column: 1; grid-row: 4; margin: 0; }
+  #v-home > #f-create { grid-column: 2; grid-row: 1 / span 4; align-self: center; }
+  #v-home .sign { margin: 0 0 4px; padding: 16px 16px 14px; }
+  #v-home .sign-big { font-size: clamp(2.8rem, 10vh, 5.4rem); }
+  #v-home .sign-small { font-size: clamp(1rem, 3.4vh, 1.7rem); }
+  #v-home .balls-deco { margin-bottom: 4px; }
+
+  /* Pseudo : formulaire centré */
+  #v-join:not([hidden]) { display: flex; flex-direction: column; justify-content: safe center; width: 100%; max-width: 640px; margin: 0 auto; }
+  #v-join .sign { margin-bottom: 10px; }
+  #v-join .panel { margin: 0 0 10px; }
+
+  /* Salle d'attente : mots, joueurs, lancement */
+  #v-lobby:not([hidden]) {
+    display: grid; gap: 14px;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas: "bar bar" "words players" "words wait";
+  }
+  #v-lobby.is-host:not([hidden]) {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, .9fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "bar bar bar" "words players host";
+  }
+  #v-lobby > .bar { grid-area: bar; flex-wrap: nowrap; }
+  #v-lobby > .c-green { grid-area: words; }
+  #v-lobby > .c-purple { grid-area: players; }
+  #v-lobby > #lobby-host { grid-area: host; }
+  #v-lobby > #lobby-wait { grid-area: wait; margin: 0; text-align: left; }
+  #v-lobby > .panel { align-self: start; max-height: 100%; overflow: auto; }
+  #v-lobby .wordcards { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; }
+  #v-lobby .players { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .bar .room-title { flex: 1 1 0; min-width: 0; }
+  .bar-react { flex: none; }
+
+  /* Partie : grille à gauche, ajustée à la hauteur ; joueurs et commandes à droite */
+  #v-game:not([hidden]) {
+    display: grid; gap: 12px 20px;
+    grid-template-columns: minmax(0, 1fr) clamp(250px, 25vw, 330px);
+    grid-template-rows: auto auto auto auto minmax(0, 1fr);
+    grid-template-areas: "bar bar" "carton hint" "carton players" "carton host" "carton .";
+  }
+  #v-game > .bar {
+    grid-area: bar; position: static; margin: 0; padding: 0;
+    background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+    flex-wrap: nowrap;
+  }
+  #v-game > .carton { grid-area: carton; margin: 0; display: flex; flex-direction: column; min-height: 0; }
+  #v-game > .game-hint { grid-area: hint; margin: 0; text-align: left; font-size: .84rem; line-height: 1.4; }
+  #v-game .players.compact { gap: 6px 10px; }
+  #v-game .players.compact .pball { font-size: .78rem; }
+  #v-game .players.compact .pname { font-size: .92rem; }
+  #v-game .players .dot { left: 22px; width: 11px; height: 11px; }
+  #v-game > .c-purple { grid-area: players; align-self: start; max-height: 100%; overflow: auto; }
+  #v-game > #game-host { grid-area: host; align-self: start; }
+  #v-game .players.compact { grid-template-columns: 1fr 1fr; }
+  #v-game .timer { font-size: clamp(1.6rem, 5vh, 2.4rem); padding: 6px 12px; }
+
+  /* Grilles (partie et résultats) : lignes égales qui remplissent la hauteur disponible */
+  #v-game .board-wrap, #v-results .board-wrap { flex: 1; min-height: 0; }
+  #v-game .board, #v-results .board { height: 100%; grid-template-rows: repeat(var(--rows, 3), minmax(0, 1fr)); }
+  #v-game .cell, #v-results .cell { min-height: 0; padding: 4px 4px 22px; container-type: size; }
+  #v-game .cell .word, #v-results .cell .word { font-size: min(1.25rem, max(.78rem, 26cqh)); }
+  #v-game .cell .word.long, #v-results .cell .word.long { font-size: min(1.1rem, max(.74rem, 22cqh)); }
+  #v-game .cell .word.xlong, #v-results .cell .word.xlong { font-size: min(1rem, max(.7rem, 19cqh)); }
+  #v-game .tokens { width: min(66px, 72cqw, 70cqh); }
+  #v-game .eraser { width: min(74px, 80cqw, 78cqh); }
+  .cell.free .word::before { font-size: min(1.4rem, 22cqh); }
+  .carton { padding: 8px; }
+  .carton-head { padding-bottom: 6px; }
+
+  /* Résultats : vainqueur, podium et classement à gauche ; grille révélée à droite */
+  #v-results:not([hidden]) {
+    display: grid; gap: 10px 24px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    grid-template-rows: auto auto auto auto minmax(0, 1fr) auto auto auto;
+  }
+  #v-results > .next-banner { grid-column: 1 / -1; grid-row: 1; margin: 0; }
+  #v-results > .room-title { grid-column: 1; grid-row: 2; }
+  #v-results > .winner { grid-column: 1; grid-row: 3; margin: 0; font-size: clamp(1.4rem, 4.5vh, 2.3rem); }
+  #v-results > .podium { grid-column: 1; grid-row: 4; margin: 0; height: 225px; --ps: .85; }
+  #v-results > .ranking { grid-column: 1; grid-row: 5 / span 4; margin: 0; min-height: 0; overflow: auto; align-self: stretch; }
+  #v-results > .carton { grid-column: 2; grid-row: 2 / span 4; margin: 0; display: flex; flex-direction: column; min-height: 0; }
+  #v-results > .replay-row { grid-column: 2; grid-row: 6; margin: 0; }
+  #v-results > #res-log { grid-column: 2; grid-row: 7; margin: 0; max-height: 30vh; overflow: auto; }
+  #v-results > #res-host { grid-column: 2; grid-row: 8; margin: 0; }
+  #v-results .ranking li { padding: 7px 0; }
+}
+/* portables étroits (1000 à 1199 pixels) : joueurs sur 2 colonnes compactes */
+@media (min-width: 1000px) and (max-width: 1199px) and (min-height: 520px) and (orientation: landscape) {
+  #v-lobby .players { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 8px; }
+  #v-lobby .players .pball { font-size: .74rem; }
+  #v-lobby .players .pname { font-size: .88rem; }
+  #v-lobby .players li { gap: 6px; }
+  #v-lobby .players .dot { left: 21px; width: 11px; height: 11px; }
+  #v-lobby .pips { gap: 2px; }
+  #v-lobby .pip { width: 11px; height: 11px; }
+}
+@media (min-width: 1000px) and (max-width: 1199px) and (min-height: 520px) and (max-height: 639px) and (orientation: landscape) {
+  #v-lobby .idea:nth-child(n+5) { display: none; } /* 4 idées au lieu de 6 sur les plus petits écrans */
+  #v-lobby .c-green > .hint { font-size: .8rem; }
+}
+/* portables très bas (moins de 640 pixels utiles) */
+@media (min-width: 1000px) and (min-height: 520px) and (max-height: 639px) and (orientation: landscape) {
+  #v-home .balls-deco { display: none; }
+  #v-home .how li { font-size: .9rem; line-height: 1.35; }
+  #v-home .how .ball { font-size: .8rem; }
+  #v-game > .game-hint { font-size: .78rem; line-height: 1.35; }
+  #v-game .players.compact { gap: 4px 8px; }
+  #v-game .players.compact .pball { font-size: .7rem; }
+  #v-game #game-host .btn { min-height: 38px; padding: 6px 14px; font-size: .92rem; }
+  #v-game .panel > h2:first-child { padding: 6px 14px; margin-bottom: 8px; }
+}
+/* portables à écran bas (environ 600 à 760 pixels utiles) : tout un peu plus serré */
+@media (min-width: 1000px) and (min-height: 520px) and (max-height: 760px) and (orientation: landscape) {
+  #app { padding-top: 10px; }
+  .panel { padding: 0 14px 12px; }
+  .panel > h2:first-child, details.panel > summary { margin: 0 -14px 10px; padding: 7px 14px; }
+  h2 { font-size: 1rem; }
+  .hint { font-size: .86rem; margin-bottom: .5em; }
+  .chips { gap: 6px; }
+  .chips button { min-height: 38px; padding: 5px 12px; font-size: .9rem; }
+  .setting { margin-bottom: 10px; }
+  .setting legend { margin-bottom: 5px; }
+  label { margin-bottom: 8px; }
+  input { min-height: 42px; padding: 7px 10px; }
+  .btn.big { min-height: 50px; padding: 10px 22px; }
+  .how { gap: 6px; }
+  .how li { font-size: .95rem; }
+  .ticket { padding: 10px 20px 12px; }
+  .wcard { padding: 22px 10px 6px; gap: 4px; }
+  .wcard input { min-height: 42px; font-size: 1.1rem; }
+  .ideas { margin-top: 10px; padding-top: 8px; gap: 6px; }
+  #ideas-more { min-height: 34px; }
+  .idea { min-height: 34px; padding: 5px 10px 5px 17px; }
+  .hostlink { margin-top: 8px; }
+  .avatars { gap: 5px; }
+  .avatars button { min-height: 36px; font-size: 1.25rem; }
+  #v-results > .podium { height: 190px; --ps: .62; }
+  .spot .disc { width: 38px; height: 38px; }
+  .crown { width: 30px; height: 24px; }
 }

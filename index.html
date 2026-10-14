@@ -8,7 +8,7 @@
   <title>Bingo du lundi matin</title>
   <meta name="description" content="Proposez vos mots en secret, cochez-les pendant la réunion, découvrez qui avait vu juste.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23D7263D'/%3E%3Ccircle cx='16' cy='16' r='9' fill='%23FFF4D2'/%3E%3Ctext x='16' y='20.5' font-size='12' font-family='Arial' font-weight='900' text-anchor='middle' fill='%231E1B3A'%3EB%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=74fb7aa8">
+  <link rel="stylesheet" href="style.css?v=adff81ee">
 </head>
 <body>
   <div id="app">
@@ -42,7 +42,7 @@
       <form id="f-create" class="panel c-red" autocomplete="off">
         <h2>Créer une partie</h2>
         <label>Nom de la réunion <span class="muted">(facultatif)</span>
-          <input id="c-title" maxlength="60" placeholder="Comité du jeudi">
+          <input id="c-title" maxlength="60" placeholder="Réunion du lundi matin">
         </label>
         <fieldset class="setting">
           <legend>Durée</legend>
@@ -83,6 +83,10 @@
         <label>Ton pseudo
           <input id="j-name" maxlength="20" required placeholder="Ton prénom ou surnom">
         </label>
+        <fieldset class="setting" id="j-avatar">
+          <legend>Ton avatar</legend>
+          <div class="avatars" id="j-avatars" role="radiogroup" aria-label="Ton avatar"></div>
+        </fieldset>
         <p id="j-error" class="error" hidden></p>
         <button type="submit" class="btn primary big">Rejoindre la partie</button>
       </form>
@@ -93,6 +97,7 @@
     <section id="v-lobby" class="view" hidden>
       <header class="bar">
         <p class="room-title" data-bind="title"></p>
+        <div class="bar-react"></div>
         <div class="code-ticket">
           <span>Code <strong data-bind="code"></strong></span>
           <button class="btn small" data-action="copy-invite">Copier le lien d'invitation</button>
@@ -101,14 +106,13 @@
 
       <div class="panel c-green">
         <h2>Tes 2 mots</h2>
-        <p class="hint">Écris un mot par carte : il part tout seul dans l'urne. Personne ne le voit avant le lancement, et personne ne saura qu'il est à toi avant la fin.</p>
+        <p class="hint">Écris un mot par carte : il part tout seul dans l'urne. Personne ne le voit avant le lancement, ni ne saura qu'il est à toi avant la fin.</p>
         <div class="wordcards">
           <div class="slot wcard" data-slot="a">
             <b class="ball b-red wcard-num" aria-hidden="true">1</b>
             <input maxlength="40" placeholder="Écris un mot" aria-label="Premier mot" enterkeyhint="done" autocomplete="off">
             <span class="wcard-stamp" aria-hidden="true">Dans l'urne</span>
             <div class="wcard-actions">
-              <button type="button" class="btn tiny" data-act="inspire">Inspire-moi</button>
               <button type="button" class="btn tiny ghost" data-act="del" hidden>Retirer</button>
             </div>
             <p class="slot-msg" aria-live="polite"></p>
@@ -118,18 +122,27 @@
             <input maxlength="40" placeholder="Écris un mot" aria-label="Deuxième mot" enterkeyhint="done" autocomplete="off">
             <span class="wcard-stamp" aria-hidden="true">Dans l'urne</span>
             <div class="wcard-actions">
-              <button type="button" class="btn tiny" data-act="inspire">Inspire-moi</button>
               <button type="button" class="btn tiny ghost" data-act="del" hidden>Retirer</button>
             </div>
             <p class="slot-msg" aria-live="polite"></p>
           </div>
+        </div>
+        <div class="ideas">
+          <p class="ideas-head"><span class="ideas-title">En panne d'idée ?</span> <span id="ideas-hint" class="hint"></span></p>
+          <div class="idea-chips" id="idea-chips"></div>
+          <button type="button" class="btn tiny" id="ideas-more">Autres idées</button>
         </div>
       </div>
 
       <div class="panel c-purple">
         <h2>Joueurs</h2>
         <ul class="players" id="lobby-players"></ul>
+        <p class="typing-line" id="lobby-typing" hidden><span class="tdots" aria-hidden="true"><i></i><i></i><i></i></span><span class="tt"></span></p>
         <p class="muted" id="lobby-summary"></p>
+        <details class="avatar-change" id="l-avatar">
+          <summary>Changer d'avatar <span id="l-avatar-now" aria-hidden="true"></span></summary>
+          <div class="avatars" id="l-avatars" role="radiogroup" aria-label="Ton avatar"></div>
+        </details>
       </div>
 
       <div class="panel c-orange host" id="lobby-host" hidden>
@@ -169,6 +182,7 @@
           <p class="room-title" data-bind="title"></p>
           <p class="on-felt small" id="game-lines"></p>
         </div>
+        <div class="bar-react"></div>
         <p class="timer" id="game-timer" aria-live="off">--:--</p>
       </header>
       <div class="carton">
@@ -178,7 +192,7 @@
           <svg class="strikes" id="game-strikes" aria-hidden="true"></svg>
         </div>
       </div>
-      <p class="on-felt center small">Touche un mot à chaque fois qu'il est prononcé : un coup de tampon. Le mot reste bloqué 4 secondes pour éviter de compter deux fois. Pour retirer un tampon, appui long sur le mot.</p>
+      <p class="on-felt center small game-hint">Touche un mot à chaque fois qu'il est prononcé : un coup de tampon. Le mot reste bloqué 4 secondes pour éviter de compter deux fois. Pour retirer un tampon, appui long sur le mot.</p>
       <div class="panel c-purple">
         <h2>Joueurs</h2>
         <ul class="players compact" id="game-players"></ul>
@@ -202,7 +216,7 @@
       <h1 class="winner" id="res-winner"></h1>
       <div class="podium" id="res-podium" aria-hidden="true" hidden></div>
       <ol class="ranking panel c-red" id="res-ranking"></ol>
-      <p><button class="btn small" data-action="replay-fx" hidden>Revoir la révélation</button></p>
+      <p class="replay-row"><button class="btn small" data-action="replay-fx" hidden>Revoir la révélation</button></p>
       <div class="carton">
         <div class="board-wrap">
           <div class="board revealed" id="res-board"></div>
@@ -230,12 +244,15 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-  <button type="button" class="sfx-toggle" id="sfx-toggle" aria-pressed="false" title="Sons du jeu">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="cross" d="M16 9l6 6M22 9l-6 6"/></svg>
-    <span class="sfx-label">Sons coupés</span>
-  </button>
+  <div class="dock">
+    <button type="button" class="sfx-toggle" id="sfx-toggle" aria-pressed="false" title="Sons du jeu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="cross" d="M16 9l6 6M22 9l-6 6"/></svg>
+      <span class="sfx-label">Sons coupés</span>
+    </button>
+    <div class="reactbar" id="reactbar" role="group" aria-label="Réactions" hidden></div>
+  </div>
 
   <script src="config.js?v=99594575"></script>
-  <script type="module" src="js/app.js?v=486504b2"></script>
+  <script type="module" src="js/app.js?v=456ab8db"></script>
 </body>
 </html>
