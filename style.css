@@ -846,6 +846,7 @@ details summary { cursor: pointer; font: 400 1rem var(--sign); }
   transition: opacity .6s ease;
 }
 .intro.leaving { opacity: 0; pointer-events: none; }
+body.intro-open { overflow: hidden; }
 .intro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .intro-flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
 .intro-loading {
