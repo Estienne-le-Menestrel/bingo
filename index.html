@@ -7,7 +7,7 @@
   <meta name="referrer" content="strict-origin">
   <title>Bingo du lundi matin</title>
   <meta name="description" content="Proposez vos mots en secret, cochez-les pendant la réunion, découvrez qui avait vu juste.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23143A52'/%3E%3Ccircle cx='16' cy='16' r='9' fill='%23E0446A' fill-opacity='.85'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23D7263D'/%3E%3Ccircle cx='16' cy='16' r='9' fill='%23FFF4D2'/%3E%3Ctext x='16' y='20.5' font-size='12' font-family='Arial' font-weight='900' text-anchor='middle' fill='%231E1B3A'%3EB%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,50 +15,58 @@
 
     <!-- Erreur de configuration / chargement -->
     <section id="v-error" class="view" hidden>
-      <h1 class="display">Bingo du lundi matin</h1>
-      <p id="error-text" class="lead"></p>
+      <h1 class="sign small"><span class="sign-big">Bingo</span><span class="sign-small">du lundi matin</span></h1>
+      <p id="error-text" class="lead on-felt"></p>
       <p><a id="error-home" href="./">Revenir à l'accueil</a></p>
     </section>
 
     <!-- Chargement -->
     <section id="v-loading" class="view">
-      <p class="muted">Connexion…</p>
+      <p class="on-felt">Connexion…</p>
     </section>
 
     <!-- Accueil : créer ou rejoindre -->
     <section id="v-home" class="view" hidden>
-      <header class="hero">
-        <h1 class="display">Bingo du lundi matin</h1>
-        <div class="hero-card" aria-hidden="true">
-          <span>synergie<i></i></span><span>on boucle</span><span>quick win<i></i></span>
-          <span>roadmap</span><span>alignés<i></i></span><span>ASAP</span>
-        </div>
+      <header class="marquee">
+        <h1 class="sign"><span class="sign-big">Bingo</span><span class="sign-small">du lundi matin</span></h1>
+        <div class="balls-deco" aria-hidden="true"><b class="ball b-red">B</b><b class="ball b-blue">I</b><b class="ball b-green">N</b><b class="ball b-yellow">G</b><b class="ball b-orange">O</b></div>
       </header>
-      <ol class="steps">
-        <li>Chaque joueur glisse 2 mots en secret dans la grille commune.</li>
-        <li>Pendant la réunion, on touche un mot à chaque fois qu'il est prononcé.</li>
-        <li>Au lancement, un mot défi farfelu s'ajoute à la grille : le premier qui arrive à le placer dans la réunion gagne 10 points.</li>
-        <li>Au gong, on révèle qui a proposé quoi. Les mots les plus entendus font gagner leur auteur.</li>
+      <p class="hero-actions"><button type="button" class="btn small felt" data-action="intro">Revoir l'intro</button></p>
+      <ol class="how">
+        <li><b class="ball b-red">1</b><span>Chaque joueur glisse 2 mots en secret dans la grille commune.</span></li>
+        <li><b class="ball b-blue">2</b><span>Pendant la réunion, on tamponne un mot à chaque fois qu'il est prononcé.</span></li>
+        <li><b class="ball b-green">3</b><span>Au lancement, un mot défi farfelu s'ajoute à la grille : le premier qui le place dans la réunion gagne 10 points.</span></li>
+        <li><b class="ball b-orange">4</b><span>Au gong, on révèle qui a proposé quoi. Les mots les plus entendus font gagner leur auteur.</span></li>
       </ol>
 
-      <form id="f-create" class="panel" autocomplete="off">
+      <form id="f-create" class="panel c-red" autocomplete="off">
         <h2>Créer une partie</h2>
         <label>Nom de la réunion <span class="muted">(facultatif)</span>
           <input id="c-title" maxlength="60" placeholder="Comité du jeudi">
         </label>
-        <div class="row2">
-          <label>Durée en minutes
+        <fieldset class="setting">
+          <legend>Durée</legend>
+          <div class="chips" role="radiogroup" aria-label="Durée de la partie" data-for="c-duration" data-unit="min">
+            <button type="button" role="radio" data-v="15">15 min</button><button type="button" role="radio" data-v="30">30 min</button><button type="button" role="radio" data-v="45">45 min</button><button type="button" role="radio" data-v="60">1 h</button><button type="button" role="radio" data-v="90">1 h 30</button><button type="button" role="radio" data-v="other">Autre</button>
+          </div>
+          <label class="other" hidden>Durée en minutes (1 à 240)
             <input id="c-duration" type="number" min="1" max="240" value="60" inputmode="numeric" required>
           </label>
-          <label>Bonus Bingo par mot
+        </fieldset>
+        <fieldset class="setting">
+          <legend>Bonus Bingo par mot</legend>
+          <div class="chips" role="radiogroup" aria-label="Bonus Bingo par mot" data-for="c-bonus">
+            <button type="button" role="radio" data-v="0">0</button><button type="button" role="radio" data-v="1">+1</button><button type="button" role="radio" data-v="2">+2</button><button type="button" role="radio" data-v="3">+3</button><button type="button" role="radio" data-v="5">+5</button><button type="button" role="radio" data-v="other">Autre</button>
+          </div>
+          <label class="other" hidden>Bonus par mot (0 à 50)
             <input id="c-bonus" type="number" min="0" max="50" value="2" inputmode="numeric" required>
           </label>
-        </div>
-        <p class="hint">Quand une ligne, une colonne ou une diagonale est entièrement cochée, chaque mot de cette ligne rapporte ce bonus à son auteur.</p>
-        <button type="submit" class="btn primary" id="c-submit">Créer la partie</button>
+          <p class="hint">Quand une ligne, une colonne ou une diagonale est entièrement tamponnée, chaque mot de cette ligne rapporte ce bonus à son auteur.</p>
+        </fieldset>
+        <button type="submit" class="btn primary big" id="c-submit">Créer la partie</button>
       </form>
 
-      <form id="f-goto" class="panel quiet" autocomplete="off">
+      <form id="f-goto" class="ticket" autocomplete="off">
         <h2>Rejoindre une partie</h2>
         <div class="inline">
           <input id="g-code" maxlength="6" placeholder="Code à 6 caractères" aria-label="Code de la partie" autocapitalize="characters">
@@ -70,68 +78,88 @@
     <!-- Choix du pseudo -->
     <section id="v-join" class="view" hidden>
       <p class="room-title" data-bind="title"></p>
-      <h1 class="display small">Qui joue ?</h1>
-      <form id="f-join" class="panel" autocomplete="off">
+      <h1 class="sign small"><span class="sign-big">Qui joue ?</span></h1>
+      <form id="f-join" class="panel c-blue" autocomplete="off">
         <label>Ton pseudo
           <input id="j-name" maxlength="20" required placeholder="Ton prénom ou surnom">
         </label>
         <p id="j-error" class="error" hidden></p>
-        <button type="submit" class="btn primary">Rejoindre la partie</button>
+        <button type="submit" class="btn primary big">Rejoindre la partie</button>
       </form>
-      <p class="muted" id="j-others"></p>
+      <p class="on-felt" id="j-others"></p>
     </section>
 
     <!-- Salle d'attente -->
     <section id="v-lobby" class="view" hidden>
       <header class="bar">
-        <div>
-          <p class="room-title" data-bind="title"></p>
-          <p class="muted">Code <strong data-bind="code"></strong></p>
+        <p class="room-title" data-bind="title"></p>
+        <div class="code-ticket">
+          <span>Code <strong data-bind="code"></strong></span>
+          <button class="btn small" data-action="copy-invite">Copier le lien d'invitation</button>
         </div>
-        <button class="btn small" data-action="copy-invite">Copier le lien d'invitation</button>
       </header>
 
-      <div class="panel">
+      <div class="panel c-green">
         <h2>Tes 2 mots</h2>
-        <p class="hint">Personne ne voit tes mots avant le lancement, et personne ne saura qu'ils sont à toi avant la fin.</p>
-        <div class="slot" data-slot="a">
-          <input maxlength="40" placeholder="Premier mot ou expression" aria-label="Premier mot">
-          <button class="btn" data-act="save">Enregistrer</button>
-          <button class="btn ghost" data-act="del" hidden>Retirer</button>
-          <p class="slot-msg" aria-live="polite"></p>
-        </div>
-        <div class="slot" data-slot="b">
-          <input maxlength="40" placeholder="Deuxième mot ou expression" aria-label="Deuxième mot">
-          <button class="btn" data-act="save">Enregistrer</button>
-          <button class="btn ghost" data-act="del" hidden>Retirer</button>
-          <p class="slot-msg" aria-live="polite"></p>
+        <p class="hint">Écris un mot par carte : il part tout seul dans l'urne. Personne ne le voit avant le lancement, et personne ne saura qu'il est à toi avant la fin.</p>
+        <div class="wordcards">
+          <div class="slot wcard" data-slot="a">
+            <b class="ball b-red wcard-num" aria-hidden="true">1</b>
+            <input maxlength="40" placeholder="Écris un mot" aria-label="Premier mot" enterkeyhint="done" autocomplete="off">
+            <span class="wcard-stamp" aria-hidden="true">Dans l'urne</span>
+            <div class="wcard-actions">
+              <button type="button" class="btn tiny" data-act="inspire">Inspire-moi</button>
+              <button type="button" class="btn tiny ghost" data-act="del" hidden>Retirer</button>
+            </div>
+            <p class="slot-msg" aria-live="polite"></p>
+          </div>
+          <div class="slot wcard" data-slot="b">
+            <b class="ball b-blue wcard-num" aria-hidden="true">2</b>
+            <input maxlength="40" placeholder="Écris un mot" aria-label="Deuxième mot" enterkeyhint="done" autocomplete="off">
+            <span class="wcard-stamp" aria-hidden="true">Dans l'urne</span>
+            <div class="wcard-actions">
+              <button type="button" class="btn tiny" data-act="inspire">Inspire-moi</button>
+              <button type="button" class="btn tiny ghost" data-act="del" hidden>Retirer</button>
+            </div>
+            <p class="slot-msg" aria-live="polite"></p>
+          </div>
         </div>
       </div>
 
-      <div class="panel quiet">
+      <div class="panel c-purple">
         <h2>Joueurs</h2>
         <ul class="players" id="lobby-players"></ul>
         <p class="muted" id="lobby-summary"></p>
       </div>
 
-      <div class="panel host" id="lobby-host" hidden>
+      <div class="panel c-orange host" id="lobby-host" hidden>
         <h2>Lancement</h2>
-        <div class="row2">
-          <label>Durée en minutes
+        <fieldset class="setting">
+          <legend>Durée</legend>
+          <div class="chips" role="radiogroup" aria-label="Durée de la partie" data-for="h-duration">
+            <button type="button" role="radio" data-v="15">15 min</button><button type="button" role="radio" data-v="30">30 min</button><button type="button" role="radio" data-v="45">45 min</button><button type="button" role="radio" data-v="60">1 h</button><button type="button" role="radio" data-v="90">1 h 30</button><button type="button" role="radio" data-v="other">Autre</button>
+          </div>
+          <label class="other" hidden>Durée en minutes (1 à 240)
             <input id="h-duration" type="number" min="1" max="240" inputmode="numeric">
           </label>
-          <label>Bonus Bingo par mot
+        </fieldset>
+        <fieldset class="setting">
+          <legend>Bonus Bingo par mot</legend>
+          <div class="chips" role="radiogroup" aria-label="Bonus Bingo par mot" data-for="h-bonus">
+            <button type="button" role="radio" data-v="0">0</button><button type="button" role="radio" data-v="1">+1</button><button type="button" role="radio" data-v="2">+2</button><button type="button" role="radio" data-v="3">+3</button><button type="button" role="radio" data-v="5">+5</button><button type="button" role="radio" data-v="other">Autre</button>
+          </div>
+          <label class="other" hidden>Bonus par mot (0 à 50)
             <input id="h-bonus" type="number" min="0" max="50" inputmode="numeric">
           </label>
-        </div>
-        <button class="btn primary" data-action="start" id="h-start">Lancer la partie</button>
+        </fieldset>
+        <button class="btn primary big" data-action="start" id="h-start">Lancer la partie</button>
         <details class="hostlink">
           <summary>Jouer l'hôte depuis un autre appareil</summary>
           <p class="hint">Ce lien donne les commandes de la partie. Ne le partage pas avec les joueurs.</p>
           <button class="btn small" data-action="copy-hostlink">Copier mon lien hôte</button>
         </details>
       </div>
-      <p class="muted center" id="lobby-wait">L'hôte lancera la partie quand tout le monde aura proposé ses mots.</p>
+      <p class="on-felt center" id="lobby-wait">L'hôte lancera la partie quand tout le monde aura proposé ses mots.</p>
     </section>
 
     <!-- Partie en cours -->
@@ -139,20 +167,23 @@
       <header class="bar sticky">
         <div>
           <p class="room-title" data-bind="title"></p>
-          <p class="muted" id="game-lines"></p>
+          <p class="on-felt small" id="game-lines"></p>
         </div>
         <p class="timer" id="game-timer" aria-live="off">--:--</p>
       </header>
-      <div class="board-wrap">
-        <div class="board" id="game-board"></div>
-        <svg class="strikes" id="game-strikes" aria-hidden="true"></svg>
+      <div class="carton">
+        <div class="carton-head" aria-hidden="true"><b class="ball b-red">B</b><b class="ball b-blue">I</b><b class="ball b-green">N</b><b class="ball b-yellow">G</b><b class="ball b-orange">O</b></div>
+        <div class="board-wrap">
+          <div class="board" id="game-board"></div>
+          <svg class="strikes" id="game-strikes" aria-hidden="true"></svg>
+        </div>
       </div>
-      <p class="hint center">Touche un mot chaque fois qu'il est prononcé. Le mot reste bloqué 4 secondes pour éviter de compter deux fois. Le bouton -1 corrige une erreur.</p>
-      <div class="panel quiet">
+      <p class="on-felt center small">Touche un mot à chaque fois qu'il est prononcé : un coup de tampon. Le mot reste bloqué 4 secondes pour éviter de compter deux fois. Pour retirer un tampon, appui long sur le mot.</p>
+      <div class="panel c-purple">
         <h2>Joueurs</h2>
         <ul class="players compact" id="game-players"></ul>
       </div>
-      <div class="panel host" id="game-host" hidden>
+      <div class="panel c-orange host" id="game-host" hidden>
         <h2>Commandes de l'hôte</h2>
         <div class="inline">
           <button class="btn" data-action="extend">Prolonger de 10 min</button>
@@ -163,24 +194,26 @@
 
     <!-- Résultats -->
     <section id="v-results" class="view" hidden>
-      <div class="next-banner panel" id="next-banner" hidden>
+      <div class="next-banner panel c-green" id="next-banner" hidden>
         <p>L'hôte a ouvert une nouvelle partie.</p>
         <a class="btn primary" id="next-link" href="#">Rejoindre la nouvelle partie</a>
       </div>
       <p class="room-title" data-bind="title"></p>
-      <h1 class="display small" id="res-winner"></h1>
+      <h1 class="winner" id="res-winner"></h1>
       <div class="podium" id="res-podium" aria-hidden="true" hidden></div>
-      <ol class="ranking" id="res-ranking"></ol>
+      <ol class="ranking panel c-red" id="res-ranking"></ol>
       <p><button class="btn small" data-action="replay-fx" hidden>Revoir la révélation</button></p>
-      <div class="board-wrap">
-        <div class="board revealed" id="res-board"></div>
-        <svg class="strikes" id="res-strikes" aria-hidden="true"></svg>
+      <div class="carton">
+        <div class="board-wrap">
+          <div class="board revealed" id="res-board"></div>
+          <svg class="strikes" id="res-strikes" aria-hidden="true"></svg>
+        </div>
       </div>
-      <details class="panel quiet" id="res-log">
+      <details class="panel c-blue" id="res-log">
         <summary>Historique des clics</summary>
         <ol class="log" id="res-log-list"></ol>
       </details>
-      <div class="panel host" id="res-host" hidden>
+      <div class="panel c-orange host" id="res-host" hidden>
         <h2>Rejouer</h2>
         <p class="hint">Crée une nouvelle salle avec les mêmes réglages. Les joueurs verront un bouton pour la rejoindre.</p>
         <div class="inline">
@@ -197,8 +230,12 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <button type="button" class="sfx-toggle" id="sfx-toggle" aria-pressed="false" title="Sons du jeu">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="cross" d="M16 9l6 6M22 9l-6 6"/></svg>
+    <span class="sfx-label">Sons coupés</span>
+  </button>
 
   <script src="config.js"></script>
-  <script type="module" src="app.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
