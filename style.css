@@ -893,3 +893,8 @@ details summary { cursor: pointer; font: 400 1rem var(--sign); }
   background: rgba(5, 12, 22, .88); color: #e7f0ee;
   font: 12px/1.45 ui-monospace, Consolas, monospace; white-space: pre-wrap;
 }
+.intro-perf {
+  position: absolute; left: 12px; top: max(14px, env(safe-area-inset-top)); z-index: 2; margin: 0;
+  padding: 4px 10px; border-radius: 999px; background: rgba(5, 12, 22, .75); color: #7df3ff;
+  font: 700 .8rem var(--body);
+}
